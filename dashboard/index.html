@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — every pre-token protocol, priced off the snapshot's own traded tokens</title>
+<link rel="stylesheet" href="app.css">
+<link rel="icon" href="data:,">
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>TOKEN RADAR <span class="v">v2 · radar-3</span></h1>
+    <p class="sub">Every pre-token protocol, ranked by a launch value fitted from the snapshot's own traded tokens — tested held-out twice before it is shown. No name is ever special-cased.</p>
+  </div>
+  <div class="asof"><span id="asof"></span><br><span class="dim">sealed DefiLlama snapshot</span></div>
+</header>
+
+<section class="kpi" id="kpi" aria-label="Integrity strip"></section>
+
+<section class="controls">
+  <input id="q" type="search" placeholder="Search a protocol…" aria-label="Search">
+  <select id="category" aria-label="Category filter"><option value="">All categories</option></select>
+  <select id="verdict" aria-label="Verdict filter">
+    <option value="">All verdicts</option><option value="FARM">FARM</option><option value="WATCH">WATCH</option><option value="SKIP">SKIP</option>
+  </select>
+  <select id="sort" aria-label="Sort">
+    <option value="implied">Sort: implied value</option>
+    <option value="expected">Sort: expected value</option>
+    <option value="odds">Sort: token odds</option>
+    <option value="tvl">Sort: TVL</option>
+    <option value="growth">Sort: 7-day growth</option>
+  </select>
+  <label class="check"><input id="watchonly" type="checkbox"> Watchlist only</label>
+  <span class="count" id="count"></span>
+</section>
+
+<main>
+  <table id="board">
+    <thead><tr>
+      <th data-k="rank">#</th><th data-k="name">Protocol</th><th data-k="category">Category</th>
+      <th data-k="tvl_usd" class="num">TVL</th><th data-k="change_7d" class="num">7d</th><th data-k="age_days" class="num">Age</th>
+      <th data-k="implied_value_usd" class="num">Implied</th><th data-k="token_odds" class="num">Odds</th>
+      <th data-k="expected_value_usd" class="num">Expected</th><th data-k="verdict">Verdict</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <p class="hint">Click a row for its detail view: the value equation, the odds behind it, and the costed farm plan. Click a column header to sort.</p>
+</main>
+
+<dialog id="detail"><div id="detail-body"></div><button id="detail-close">Close</button></dialog>
+
+<section class="panels">
+  <div class="panel model">
+    <h2>The model, with its error on the table</h2>
+    <p class="dim">log<sub>10</sub>(market cap) = a + b·log<sub>10</sub>(TVL) + d·log<sub>10</sub>(age) + category offsets, fitted by least squares on the snapshot's traded protocols. Growth is fitted on the residuals and held at zero — the snapshot does not price it. Two held-out tests run before any value is shown; the dashboard prints both multiples, not just the fit.</p>
+    <table id="terms"><thead><tr><th>Term</th><th class="num">Fitted</th><th class="num">Applied</th><th>Note</th></tr></thead><tbody></tbody></table>
+    <p id="tests" class="tests"></p>
+    <div class="sandbox">
+      <h3>Model sandbox — move the terms, watch the board re-rank</h3>
+      <label>TVL slope × <input id="sb-tvl" type="range" min="0.5" max="1.5" step="0.05" value="1"> <b id="sb-tvl-v">1.00×</b></label>
+      <label>Growth weight <input id="sb-growth" type="range" min="0" max="2" step="0.1" value="0"> <b id="sb-growth-v">0.0</b></label>
+      <button id="sb-reset">Reset to the fitted model</button>
+      <p class="dim">The sandbox recomputes every row live. The submitted board always uses the fitted weights above.</p>
+    </div>
+  </div>
+
+  <div class="panel audit">
+    <h2>The 758 audit — every protocol accounted for</h2>
+    <p class="dim">The snapshot holds 758 protocols. Each one is in exactly one bucket below; the counts sum to 758, and the watchlist is covered 40 of 40. Wrapped, staked and bridged products of tokens that already trade are never ranked as launches.</p>
+    <ul id="audit-list"></ul>
+    <h3>Token odds — the peers' record</h3>
+    <p class="dim">Odds are the share of protocols in the same category and age band that already record a token, shrunk toward the global rate. They are a base rate, not a prediction of whether or when a token is issued. Expected value is implied value × odds.</p>
+  </div>
+</section>
+
+<section class="panel live">
+  <h2>Live tokens — the market's own values, kept apart</h2>
+  <p class="dim">Protocols whose token already trades are never mixed into the ranked board. The top 24 by market cap are below, with the market's own value — these are the comps the model learned from.</p>
+  <table id="live-table"><thead><tr><th>Protocol</th><th>Category</th><th class="num">TVL</th><th class="num">Market cap</th><th class="num">mcap / TVL</th></tr></thead><tbody></tbody></table>
+</section>
+
+<footer>
+  <p>Built from the sealed snapshot alone: no network, no outside data, no hardcoded names. The same program that wrote this page wrote board.json — the board you see is the board that was scored. Deterministic: two runs write the same bytes.</p>
+</footer>
+
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
